@@ -13,13 +13,9 @@ jobs:
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 17 }
       
-      # نصب کیت توسعه اندروید
-      - uses: android-actions/setup-android@v3
-      
       - name: Prepare web files
         run: mkdir -p www && cp index.html manifest.webmanifest sw.js native-bridge.js icon-192.png icon-512.png www/
       
-      # نصب ابزار ویرایش عکس برای ساخت آیکون‌ها
       - name: Install ImageMagick
         run: sudo apt-get update && sudo apt-get install -y imagemagick
       
@@ -39,7 +35,6 @@ jobs:
           
       - run: npx cap sync android
       
-      # اصلاح فایل gradlew و ساخت APK
       - name: Build APK
         run: |
           cd android
