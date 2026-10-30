@@ -12,20 +12,41 @@ jobs:
         with: { node-version: 20 }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 17 }
+      
+      # نصب کیت توسعه اندروید
+      - uses: android-actions/setup-android@v3
+      
       - name: Prepare web files
         run: mkdir -p www && cp index.html manifest.webmanifest sw.js native-bridge.js icon-192.png icon-512.png www/
+      
+      # نصب ابزار ویرایش عکس برای ساخت آیکون‌ها
+      - name: Install ImageMagick
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+      
       - run: npm install
+      - run: npm install @capacitor/cli @capacitor/core @capacitor/android
       - run: npx cap add android
+      
       - name: App icons
         run: |
-          R=android/app/src/main/res; C=$(command -v convert || echo magick)
+          R=android/app/src/main/res
+          C=$(command -v convert || command -v magick)
           for d in "mdpi 48 108" "hdpi 72 162" "xhdpi 96 216" "xxhdpi 144 324" "xxxhdpi 192 432"; do set -- $d
             $C www/icon-512.png -resize ${2}x${2} $R/mipmap-$1/ic_launcher.png
             cp $R/mipmap-$1/ic_launcher.png $R/mipmap-$1/ic_launcher_round.png
             $C www/icon-512.png -resize $(($3*68/100))x$(($3*68/100)) -background '#24685f' -gravity center -extent ${3}x${3} $R/mipmap-$1/ic_launcher_foreground.png
           done
+          
       - run: npx cap sync android
-      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      
+      # اصلاح فایل gradlew و ساخت APK
+      - name: Build APK
+        run: |
+          cd android
+          sed -i 's/\r$//' gradlew
+          chmod +x gradlew
+          ./gradlew assembleDebug
+          
       - uses: actions/upload-artifact@v4
         with:
           name: daftar-hooshmand-apk
