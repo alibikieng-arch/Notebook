@@ -1,0 +1,9 @@
+{
+ "appId": "app.daftar.hooshmand",
+ "appName": "دفتر هوشمند",
+ "webDir": "www",
+ "backgroundColor": "#f4f6f8",
+ "server": {
+  "androidScheme": "https"
+ }
+}
